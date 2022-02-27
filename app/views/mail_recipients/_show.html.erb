@@ -1,0 +1,183 @@
+<!-- プロジェクト設定のタブ表示 -->
+<%
+  trackers = @project.trackers
+  notifiables = Redmine::Notifiable.all.select { |n| n.parent.blank? }
+  recipients = @project.mail_recipient.all
+  recipient = recipients.first || MailRecipient.new
+%>
+<%= form_tag({controller: :mail_recipients, action: :update, project_id: @project.id},
+             id: 'mail_recipient',
+             method: 'PUT') do %>
+
+<div class="box tabular setting">
+  <p>
+    <label for="mail_recipient_notifiable"><%= l(:field_mail_notification) %>:</label>
+    <%= select_tag('mail_recipient_notifiable',
+                   options_for_select(notifiables.map { |n| [l_or_humanize(n.name, prefix: 'label_'), n.name] },
+                                      recipient.notifiable),
+                   onchange: 'changeMailRecipientTracker(); changeMailRecipientTrackerConfigured(); changeMailRecipient();') %>
+  </p>
+
+  <p>
+    <label for="mail_recipient_tracker_id"><%= l(:field_tracker) %>:</label>
+    <%= select_tag('mail_recipient_tracker_id',
+                   options_for_select([[l(:label_recipient_tracker_all), '']] + trackers.map { |t| [t.name, t.id] },
+                                      recipient.tracker_id),
+                   onchange: 'changeMailRecipient();') %>
+  </p>
+
+  <p>
+    <label for="mail_recipient_to"><%= l(:label_recipient_to) %>:</label>
+    <%= text_field_tag('mail_recipient_to', recipient.to) %>
+  </p>
+
+  <p>
+    <%= check_box_tag('mail_recipient_to_except_cc',
+                      true,
+                      recipient.to_except_cc,
+                      onchange: 'confirmMailRecipientCheckBox(event.target);') %>
+    <label for="mail_recipient_to_except_cc" style="margin-left: 0px; float: inherit;">
+      <%= l(:label_recipient_to_except_cc) %>
+    </label>
+  </p>
+
+  <p>
+    <label for="mail_recipient_cc"><%= l(:label_recipient_cc) %>:</label>
+    <%= text_field_tag('mail_recipient_cc', recipient.cc) %>
+  </p>
+
+  <p>
+    <%= check_box_tag('mail_recipient_cc_except_to',
+                      true,
+                      recipient.cc_except_to,
+                      onchange: 'confirmMailRecipientCheckBox(event.target);') %>
+    <label for="mail_recipient_cc_except_to" style="margin-left: 0px; float: inherit;">
+      <%= l(:label_recipient_cc_except_to) %>
+    </label>
+  </p>
+</div>
+
+<p>
+  <%= submit_tag(l(:button_save)) %>
+</p>
+
+<% end %> <!-- form_tag -->
+
+<script type="text/javascript">
+  var mailRecipients = [
+  <% recipients.each do |r| %>
+    <%= raw(r.to_json()) %>,
+  <% end %>
+  ];
+
+  function changeMailRecipientNotifiableConfigured() {
+    let options = document.getElementById('mail_recipient_notifiable').querySelectorAll('option');
+    for (let i = 0; i < options.length; i++) {
+      options[i].style = null;
+
+      let configured = mailRecipients.find(t => t.notifiable === options[i].value);
+      if (configured) {
+        options[i].style = 'color: orange;';
+      }
+    }
+  }
+
+  function changeMailRecipientTracker() {
+    let notifiable = document.getElementById('mail_recipient_notifiable').value;
+
+    let tracker = document.getElementById('mail_recipient_tracker_id');
+
+    if (notifiable.startsWith('issue')) {
+      tracker.disabled = false;
+    }
+    else {
+      tracker.value = '';
+      tracker.disabled = true;
+    }
+  }
+
+  function changeMailRecipientTrackerConfigured() {
+    let notifiable = document.getElementById('mail_recipient_notifiable').value;
+    let options = document.getElementById('mail_recipient_tracker_id').querySelectorAll('option');
+    for (let i = 0; i < options.length; i++) {
+      options[i].style = null;
+
+      let configured = mailRecipients.find(r =>
+        r.notifiable === notifiable && (r.tracker_id || '') == options[i].value);
+      if (configured) {
+        options[i].style = 'color: orange;';
+      }
+    }
+  }
+
+  function changeMailRecipient() {
+    let notifiable = document.getElementById('mail_recipient_notifiable').value;
+
+    let tracker_id = document.getElementById('mail_recipient_tracker_id').value || null;
+
+    let to_except_cc = document.getElementById('mail_recipient_to_except_cc');
+    to_except_cc.disabled = false;
+    to_except_cc.checked = false;
+
+    let cc_except_to = document.getElementById('mail_recipient_cc_except_to');
+    cc_except_to.disabled = false;
+    cc_except_to.checked = false;
+
+    let to = document.getElementById('mail_recipient_to');
+    to.disabled = false;
+    to.value = '';
+
+    let cc = document.getElementById('mail_recipient_cc');
+    cc.disabled = false;
+    cc.value = '';
+
+    for (let i = 0; i < mailRecipients.length; i++) {
+      if (mailRecipients[i].notifiable == notifiable && mailRecipients[i].tracker_id == tracker_id) {
+        to.value = mailRecipients[i].to;
+        cc.value = mailRecipients[i].cc;
+        to_except_cc.checked = mailRecipients[i].to_except_cc
+        cc_except_to.checked = mailRecipients[i].cc_except_to
+
+        changeMailRecipientTextBox(to_except_cc);
+        changeMailRecipientTextBox(cc_except_to);
+
+        break;
+      }
+    }
+  }
+
+  function confirmMailRecipientCheckBox(check) {
+    let checks = document.getElementById('mail_recipient').querySelectorAll('input[type="checkbox"]');
+    let off = Array.from(checks).find(c => !c.checked);
+    if (!off) {
+      alert('<%= l(:alert_recipient_to_cc) %>');
+      check.checked = false;
+      return;
+    }
+
+    changeMailRecipientTextBox(check);
+  }
+
+  function changeMailRecipientTextBox(checkbox) {
+    let text = checkbox.closest('p').previousElementSibling.querySelector('input[type="text"]');
+    if (checkbox.checked) {
+      text.value = '';
+      text.disabled = true;
+    } else {
+      text.disabled = false;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    changeMailRecipientNotifiableConfigured();
+
+    changeMailRecipientTrackerConfigured();
+
+    changeMailRecipientTracker();
+
+    let checks = document.getElementById('mail_recipient').querySelectorAll('input[type="checkbox"]');
+    for (let i = 0; i < checks.length; i++) {
+      changeMailRecipientTextBox(checks[i]);
+    }
+  });
+</script>

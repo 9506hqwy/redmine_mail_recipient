@@ -1,0 +1,10 @@
+en:
+  alert_recipient_to_cc: Please specify TO or CC.
+  label_recipient_cc: CC
+  label_recipient_cc_except_to: Send to users that excluded TO.
+  label_recipient_to: TO
+  label_recipient_to_except_cc: Send to users that excluded CC.
+  label_recipient_tracker_all: All
+  mail_recipient: Mail Recipient
+  permission_edit_mail_recipient: Edit Mail Recipient
+  project_module_mail_recipient: Mail Recipient

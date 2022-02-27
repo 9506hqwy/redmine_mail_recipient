@@ -1,0 +1,10 @@
+ja:
+  alert_recipient_to_cc: TO または CC のどちらかは設定してください。
+  label_recipient_cc: CC
+  label_recipient_cc_except_to: TO に含まれないユーザに送信する。
+  label_recipient_to: TO
+  label_recipient_to_except_cc: CC に含まれないユーザに送信する。
+  label_recipient_tracker_all: すべて
+  mail_recipient: メール受信者
+  permission_edit_mail_recipient: メール受信者編集
+  project_module_mail_recipient: メール受信者
