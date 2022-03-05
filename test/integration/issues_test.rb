@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'test_after_commit' if ActiveRecord::VERSION::MAJOR < 5
 require File.expand_path('../../test_helper', __FILE__)
 
 class IssuesTest < Redmine::IntegrationTest
@@ -149,15 +150,16 @@ class IssuesTest < Redmine::IntegrationTest
   def test_issue_edit
     log_user('jsmith', 'jsmith')
 
-    put(
-      '/issues/2',
-      params: {
-        issue: {
-          subject: "test issue",
-        }
-      })
+    put_issue_edit do
+      put(
+        '/issues/2',
+        params: {
+          issue: {
+            subject: "test issue",
+          }
+        })
+    end
 
-    # FIXME: 0 at test only in Redmine3
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 2, ActionMailer::Base.deliveries.last.to.length
     assert_equal 1, ActionMailer::Base.deliveries.last.cc.length
@@ -178,15 +180,16 @@ class IssuesTest < Redmine::IntegrationTest
 
     log_user('jsmith', 'jsmith')
 
-    put(
-      '/issues/2',
-      params: {
-        issue: {
-          subject: "test issue",
-        }
-      })
+    put_issue_edit do
+      put(
+        '/issues/2',
+        params: {
+          issue: {
+            subject: "test issue",
+          }
+        })
+    end
 
-    # FIXME: 0 at test only in Redmine3
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 1, ActionMailer::Base.deliveries.last.to.length
     assert_equal 2, ActionMailer::Base.deliveries.last.cc.length
@@ -207,15 +210,16 @@ class IssuesTest < Redmine::IntegrationTest
 
     log_user('jsmith', 'jsmith')
 
-    put(
-      '/issues/2',
-      params: {
-        issue: {
-          subject: "test issue",
-        }
-      })
+    put_issue_edit do
+      put(
+        '/issues/2',
+        params: {
+          issue: {
+            subject: "test issue",
+          }
+        })
+    end
 
-    # FIXME: 0 at test only in Redmine3
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 1, ActionMailer::Base.deliveries.last.to.length
     assert_equal 2, ActionMailer::Base.deliveries.last.cc.length
@@ -236,15 +240,16 @@ class IssuesTest < Redmine::IntegrationTest
 
     log_user('jsmith', 'jsmith')
 
-    put(
-      '/issues/2',
-      params: {
-        issue: {
-          assigned_to_id: 2,
-        }
-      })
+    put_issue_edit do
+      put(
+        '/issues/2',
+        params: {
+          issue: {
+            assigned_to_id: 2,
+          }
+        })
+    end
 
-    # FIXME: 0 at test only in Redmine3
     assert_equal 1, ActionMailer::Base.deliveries.length
     # FIXME: previous_assignee does not work.
     # assert_equal 1, ActionMailer::Base.deliveries.last.to.length
@@ -266,15 +271,16 @@ class IssuesTest < Redmine::IntegrationTest
 
     log_user('jsmith', 'jsmith')
 
-    put(
-      '/issues/2',
-      params: {
-        issue: {
-          subject: "test issue",
-        }
-      })
+    put_issue_edit do
+      put(
+        '/issues/2',
+        params: {
+          issue: {
+            subject: "test issue",
+          }
+        })
+    end
 
-    # FIXME: 0 at test only in Redmine3
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 2, ActionMailer::Base.deliveries.last.to.length
     assert_equal 1, ActionMailer::Base.deliveries.last.cc.length
@@ -295,15 +301,16 @@ class IssuesTest < Redmine::IntegrationTest
 
     log_user('jsmith', 'jsmith')
 
-    put(
-      '/issues/2',
-      params: {
-        issue: {
-          subject: "test issue",
-        }
-      })
+    put_issue_edit do
+      put(
+        '/issues/2',
+        params: {
+          issue: {
+            subject: "test issue",
+          }
+        })
+    end
 
-    # FIXME: 0 at test only in Redmine3
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 1, ActionMailer::Base.deliveries.last.to.length
     assert_equal 2, ActionMailer::Base.deliveries.last.cc.length
@@ -324,20 +331,29 @@ class IssuesTest < Redmine::IntegrationTest
 
     log_user('jsmith', 'jsmith')
 
-    put(
-      '/issues/2',
-      params: {
-        issue: {
-          subject: "test issue",
-        }
-      })
+    put_issue_edit do
+      put(
+        '/issues/2',
+        params: {
+          issue: {
+            subject: "test issue",
+          }
+        })
+    end
 
-    # FIXME: 0 at test only in Redmine3
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 1, ActionMailer::Base.deliveries.last.to.length
     assert_equal 2, ActionMailer::Base.deliveries.last.cc.length
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.to
     assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
+  end
+
+  def put_issue_edit(&block)
+    if ActiveRecord::VERSION::MAJOR >= 5
+      yield
+    else
+      TestAfterCommit.with_commits(true, &block)
+    end
   end
 end
