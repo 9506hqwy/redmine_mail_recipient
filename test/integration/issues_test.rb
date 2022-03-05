@@ -251,12 +251,11 @@ class IssuesTest < Redmine::IntegrationTest
     end
 
     assert_equal 1, ActionMailer::Base.deliveries.length
-    # FIXME: previous_assignee does not work.
-    # assert_equal 1, ActionMailer::Base.deliveries.last.to.length
-    # assert_equal 2, ActionMailer::Base.deliveries.last.cc.length
-    # assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
-    # assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc
-    # assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
+    assert_equal 1, ActionMailer::Base.deliveries.last.to.length
+    assert_equal 2, ActionMailer::Base.deliveries.last.cc.length
+    assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc
+    assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
   def test_issue_edit_recipient_watchers

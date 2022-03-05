@@ -87,9 +87,9 @@ module RedmineMailRecipient
       if @journal # issue_edit
         recipients['@author'] = @issue.author
         recipients['@assigned_to'] = @issue.assigned_to if @issue.assigned_to
-        if Redmine::VERSION::MAJOR >= 4 && @issue.previous_assignee
-          # FIXME: previous_assignee does not work.
-          recipients['@previous_assignee'] = @issue.previous_assignee
+        assigned_to_value = @journal.detail_for_attribute('assigned_to_id')
+        if assigned_to_value.present?
+          recipients['@previous_assignee'] = Principal.find_by_id(assigned_to_value.old_value)
         end
         recipients['@watchers'] = @journal.notified_watchers
         recipients['@commenter'] = @author
