@@ -2,6 +2,7 @@
 <%
   trackers = @project.trackers
   notifiables = Redmine::Notifiable.all.select { |n| n.parent.blank? }
+  notifiables.reject! { |n| n.name == 'wiki_comment_added' } unless mail_recipient_wiki_extensions_enable?
   recipients = @project.mail_recipient.all
   recipient = recipients.first || MailRecipient.new
 %>

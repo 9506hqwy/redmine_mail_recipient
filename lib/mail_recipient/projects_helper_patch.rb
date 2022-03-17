@@ -14,6 +14,14 @@ module RedmineMailRecipient
       tabs << action if User.current.allowed_to?(action, @project)
       tabs
     end
+
+    def mail_recipient_wiki_extensions_enable?
+      plugin = Redmine::Plugin.find(:redmine_wiki_extensions)
+      version = plugin.version.split('.').map(&:to_i)
+      ([0, 9, 3] <=> version) <= 0
+    rescue Redmine::PluginNotFound
+      return false
+    end
   end
 
   module ProjectsHelperPatch4

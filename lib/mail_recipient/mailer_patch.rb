@@ -17,6 +17,9 @@ module RedmineMailRecipient
         return @message.project
       elsif @wiki_content
         return @wiki_content.project
+      elsif @text && @project
+        # for redmine_wiki_extensions
+        return @project
       end
 
       nil
@@ -71,6 +74,9 @@ module RedmineMailRecipient
         else
           'wiki_content_updated'
         end
+      elsif @text && @project
+        # for redmine_wiki_extensions
+        'wiki_comment_added'
       else
         nil
       end
@@ -112,6 +118,9 @@ module RedmineMailRecipient
         recipients['@watchers'] = @message.root.notified_watchers | @message.board.notified_watchers
       elsif @wiki_content # wiki_content_added / wiki_content_updated
         recipients['@watchers'] = @wiki_content.page.wiki.notified_watchers | @wiki_content.page.notified_watchers
+      elsif @text && @project
+        # for redmine_wiki_extensions
+        # PASS
       end
 
       setting.update_mail_headers(headers, users, recipients)

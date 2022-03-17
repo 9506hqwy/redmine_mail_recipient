@@ -22,7 +22,7 @@ class WikiTest < Redmine::IntegrationTest
 
   def setup
     Setting.bcc_recipients = false
-    Setting.notified_events = ['wiki_content_added', 'wiki_content_updated']
+    Setting.notified_events = ['wiki_content_added', 'wiki_content_updated', 'wiki_comment_added']
     Project.find(1).enable_module!(:mail_delivery_compat3)
     ActionMailer::Base.deliveries.clear
   end
@@ -173,5 +173,65 @@ class WikiTest < Redmine::IntegrationTest
     assert_equal 2, ActionMailer::Base.deliveries.last.cc.length
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
+  end
+
+  def test_wiki_comment_added
+    skip unless Redmine::Plugin.installed?(:redmine_wiki_extensions)
+
+    plugin = Redmine::Plugin.find(:redmine_wiki_extensions)
+    version = plugin.version.split('.').map(&:to_i)
+    skip unless ([0, 9, 3] <=> version) <= 0
+
+    Project.find(1).enable_module!(:wiki_extensions)
+    Role.find(1).add_permission!(:add_wiki_comment)
+
+    page = wiki_pages(:wiki_pages_001)
+
+    log_user('jsmith', 'jsmith')
+
+    post(
+      '/projects/ecookbook/wiki_extensions/add_comment',
+      params: {
+        wiki_page_id: page.id,
+        comment: 'test comment',
+      })
+
+    assert_equal 1, ActionMailer::Base.deliveries.length
+    assert_equal 2, ActionMailer::Base.deliveries.last.to.length
+    assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.to
+    assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
+  end
+
+  def test_wiki_comment_added_author
+    skip unless Redmine::Plugin.installed?(:redmine_wiki_extensions)
+
+    plugin = Redmine::Plugin.find(:redmine_wiki_extensions)
+    version = plugin.version.split('.').map(&:to_i)
+    skip unless ([0, 9, 3] <=> version) <= 0
+
+    Project.find(1).enable_module!(:mail_recipient)
+    Project.find(1).enable_module!(:wiki_extensions)
+    Role.find(1).add_permission!(:add_wiki_comment)
+
+    m = MailRecipient.new
+    m.project_id = 1
+    m.notifiable = 'wiki_comment_added'
+    m.to = '@author'
+    m.save!
+
+    page = wiki_pages(:wiki_pages_001)
+
+    log_user('jsmith', 'jsmith')
+
+    post(
+      '/projects/ecookbook/wiki_extensions/add_comment',
+      params: {
+        wiki_page_id: page.id,
+        comment: 'test comment',
+      })
+
+    assert_equal 1, ActionMailer::Base.deliveries.length
+    assert_equal 1, ActionMailer::Base.deliveries.last.to.length
+    assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.to
   end
 end
