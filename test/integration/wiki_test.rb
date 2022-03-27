@@ -21,7 +21,7 @@ class WikiTest < Redmine::IntegrationTest
            :wikis
 
   def setup
-    Setting.bcc_recipients = false
+    Setting.bcc_recipients = false if Setting.available_settings.key?('bcc_recipients')
     Setting.notified_events = ['wiki_content_added', 'wiki_content_updated', 'wiki_comment_added']
     Project.find(1).enable_module!(:mail_delivery_compat3)
     ActionMailer::Base.deliveries.clear

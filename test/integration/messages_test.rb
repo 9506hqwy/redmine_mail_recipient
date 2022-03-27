@@ -19,7 +19,7 @@ class MessagesTest < Redmine::IntegrationTest
            :watchers
 
   def setup
-    Setting.bcc_recipients = false
+    Setting.bcc_recipients = false if Setting.available_settings.key?('bcc_recipients')
     Setting.notified_events = ['message_posted']
     Project.find(1).enable_module!(:mail_delivery_compat3)
     ActionMailer::Base.deliveries.clear
