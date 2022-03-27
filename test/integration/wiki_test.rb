@@ -124,10 +124,15 @@ class WikiTest < Redmine::IntegrationTest
         })
     end
 
+    expect = 0
+    expect += 1 if default_watcher_added
+
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 2, ActionMailer::Base.deliveries.last.to.length
+    assert_equal expect, ActionMailer::Base.deliveries.last.cc.length
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.to
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc if default_watcher_added
   end
 
   def test_wiki_content_updated_recipient_author
@@ -152,11 +157,15 @@ class WikiTest < Redmine::IntegrationTest
         })
     end
 
+    expect = 1
+    expect += 1 if default_watcher_added
+
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 1, ActionMailer::Base.deliveries.last.to.length
-    assert_equal 1, ActionMailer::Base.deliveries.last.cc.length
+    assert_equal expect, ActionMailer::Base.deliveries.last.cc.length
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.to
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc if default_watcher_added
   end
 
   def test_wiki_content_updated_recipient_watchers
@@ -181,9 +190,13 @@ class WikiTest < Redmine::IntegrationTest
         })
     end
 
+    expect = 0
+    expect += 1 if default_watcher_added
+
     assert_equal 1, ActionMailer::Base.deliveries.length
-    assert_equal 0, ActionMailer::Base.deliveries.last.to.length
+    assert_equal expect, ActionMailer::Base.deliveries.last.to.length
     assert_equal 2, ActionMailer::Base.deliveries.last.cc.length
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.to if default_watcher_added
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
@@ -199,6 +212,7 @@ class WikiTest < Redmine::IntegrationTest
     Role.find(1).add_permission!(:add_wiki_comment)
 
     page = wiki_pages(:wiki_pages_001)
+    page.add_watcher(users(:users_001)) unless default_watcher_added
 
     log_user('jsmith', 'jsmith')
 
@@ -212,7 +226,8 @@ class WikiTest < Redmine::IntegrationTest
     end
 
     assert_equal 1, ActionMailer::Base.deliveries.length
-    assert_equal 2, ActionMailer::Base.deliveries.last.to.length
+    assert_equal 3, ActionMailer::Base.deliveries.last.to.length
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.to
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.to
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
   end
@@ -235,6 +250,7 @@ class WikiTest < Redmine::IntegrationTest
     m.save!
 
     page = wiki_pages(:wiki_pages_001)
+    page.add_watcher(users(:users_001)) unless default_watcher_added
 
     log_user('jsmith', 'jsmith')
 
@@ -250,5 +266,15 @@ class WikiTest < Redmine::IntegrationTest
     assert_equal 1, ActionMailer::Base.deliveries.length
     assert_equal 1, ActionMailer::Base.deliveries.last.to.length
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.to
+  end
+
+  private
+
+  def default_watcher_added
+    return true if Redmine::VERSION.revision >= 21016
+
+    (RedMica::VERSION::ARRAY[0..1] <=> [1, 3]) >= 0
+  rescue
+    false
   end
 end
