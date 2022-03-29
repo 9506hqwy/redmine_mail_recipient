@@ -1,10 +1,18 @@
 # frozen_string_literal: true
 
-require_dependency 'mail_recipient/mailer_patch'
-require_dependency 'mail_recipient/project_patch'
-require_dependency 'mail_recipient/projects_helper_patch'
-require_dependency 'mail_recipient/tracker_patch'
-require_dependency 'mail_recipient/utils'
+basedir = File.expand_path('../lib', __FILE__)
+libraries =
+  [
+    'redmine_mail_recipient/mailer_patch',
+    'redmine_mail_recipient/project_patch',
+    'redmine_mail_recipient/projects_helper_patch',
+    'redmine_mail_recipient/tracker_patch',
+    'redmine_mail_recipient/utils',
+  ]
+
+libraries.each do |library|
+  require_dependency File.expand_path(library, basedir)
+end
 
 Redmine::Plugin.register :redmine_mail_recipient do
   name 'Redmine Mail Recipient plugin'
