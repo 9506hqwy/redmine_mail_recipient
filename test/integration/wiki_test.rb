@@ -271,7 +271,8 @@ class WikiTest < Redmine::IntegrationTest
   private
 
   def default_watcher_added
-    return true if Redmine::VERSION.revision >= 21016
+    return true if Redmine::VERSION.revision.to_i >= 21016
+    return true if Redmine::VERSION::MAJOR >= 5
 
     (RedMica::VERSION::ARRAY[0..1] <=> [1, 3]) >= 0
   rescue
