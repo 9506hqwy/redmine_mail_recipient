@@ -111,6 +111,37 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
+  def test_wiki_content_added_recipient_mentioned
+    skip unless Redmine::VERSION::MAJOR >= 5
+
+    Project.find(1).enable_module!(:mail_recipient)
+
+    m = MailRecipient.new
+    m.project_id = 1
+    m.notifiable = 'wiki_content_added'
+    m.to = '@mentioned'
+    m.save!
+
+    log_user('jsmith', 'jsmith')
+
+    perform_enqueued_jobs do
+      new_record(WikiContent) do
+        put(
+          '/projects/ecookbook/wiki/Wiki',
+          params: {
+            content: {
+              text: "@admin"
+            }
+          })
+      end
+    end
+
+    assert_equal 1, ActionMailer::Base.deliveries.length
+    assert_equal 1, ActionMailer::Base.deliveries.last.to.length
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.to
+    assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
+  end
+
   def test_wiki_content_updated
     log_user('jsmith', 'jsmith')
 
@@ -199,6 +230,35 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.to if default_watcher_added
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
+  end
+
+  def test_wiki_content_updated_recipient_mentioned
+    skip unless Redmine::VERSION::MAJOR >= 5
+
+    Project.find(1).enable_module!(:mail_recipient)
+
+    m = MailRecipient.new
+    m.project_id = 1
+    m.notifiable = 'wiki_content_updated'
+    m.to = '@mentioned'
+    m.save!
+
+    log_user('jsmith', 'jsmith')
+
+    perform_enqueued_jobs do
+      put(
+        '/projects/ecookbook/wiki/CookBook_documentation',
+        params: {
+          content: {
+            text: "@admin"
+          }
+        })
+    end
+
+    assert_equal 1, ActionMailer::Base.deliveries.length
+    assert_equal 1, ActionMailer::Base.deliveries.last.to.length
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.to
+    assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
   end
 
   def test_wiki_comment_added

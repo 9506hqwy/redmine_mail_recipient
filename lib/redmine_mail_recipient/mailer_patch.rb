@@ -103,9 +103,17 @@ module RedmineMailRecipient
           .where(journalized_id: @issue.id, journalized_type: 'Issue')
           .map { |j| j.user }
           .uniq
+        if mail_recipient_enable_mention
+          @journal.mail_delivery_compat3_parse_mentions_for_issue_edit
+          recipients['@mentioned'] = @journal.notified_mentions | @journal.journalized.notified_mentions
+        end
       elsif @issue # issue_add
         recipients['@assigned_to'] = @issue.assigned_to if @issue.assigned_to
         recipients['@watchers'] = @issue.notified_watchers
+        if mail_recipient_enable_mention
+          @issue.mail_delivery_compat3_parse_mentions_for_issue_add
+          recipients['@mentioned'] = @issue.notified_mentions
+        end
       elsif @document # document_added
         # PASS
       elsif @attachments # attachments_added
@@ -118,6 +126,10 @@ module RedmineMailRecipient
         recipients['@watchers'] = @message.root.notified_watchers | @message.board.notified_watchers
       elsif @wiki_content # wiki_content_added / wiki_content_updated
         recipients['@watchers'] = @wiki_content.page.wiki.notified_watchers | @wiki_content.page.notified_watchers
+        if mail_recipient_enable_mention
+          @wiki_content.mail_delivery_compat3_parse_mentions_for_wiki_content
+          recipients['@mentioned'] = @wiki_content.notified_mentions
+        end
       elsif @text && @project
         # for redmine_wiki_extensions
         # PASS
@@ -136,6 +148,10 @@ module RedmineMailRecipient
 
         mail_recipient_classify_recipients(headers, setting)
       end
+    end
+
+    def mail_recipient_enable_mention
+      Redmine::VERSION::MAJOR >= 5
     end
   end
 

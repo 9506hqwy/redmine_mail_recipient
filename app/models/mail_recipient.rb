@@ -38,7 +38,7 @@ class MailRecipient < ActiveRecord::Base
           users |= [recipients[key]]
         when '@assigned_to', '@previous_assignee'
           users |= recipients[key].is_a?(Group)? recipients[key].users : [recipients[key]]
-        when '@watchers', '@commenters'
+        when '@watchers', '@commenters', '@mentioned'
           users |= recipients[key]
         end
       end

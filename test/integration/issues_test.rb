@@ -156,6 +156,41 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
+  def test_issue_add_recipient_mentioned
+    skip unless Redmine::VERSION::MAJOR >= 5
+
+    Project.find(1).enable_module!(:mail_recipient)
+
+    m = MailRecipient.new
+    m.project_id = 1
+    m.notifiable = 'issue_added'
+    m.to = '@mentioned'
+    m.save!
+
+    log_user('jsmith', 'jsmith')
+
+    perform_enqueued_jobs do
+      new_record(Issue) do
+        post(
+          '/projects/ecookbook/issues',
+          params: {
+            issue: {
+              tracker_id: '1',
+              start_date: '2000-01-01',
+              priority_id: "5",
+              subject: "test issue",
+              description: '@admin',
+            }
+          })
+      end
+    end
+
+    assert_equal 1, ActionMailer::Base.deliveries.length
+    assert_equal 1, ActionMailer::Base.deliveries.last.to.length
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.to
+    assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
+  end
+
   def test_issue_edit
     log_user('jsmith', 'jsmith')
 
@@ -369,6 +404,70 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.to
     assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
+  end
+
+  def test_issue_edit_recipient_mentioned_description
+    skip unless Redmine::VERSION::MAJOR >= 5
+
+    Project.find(1).enable_module!(:mail_recipient)
+
+    m = MailRecipient.new
+    m.project_id = 1
+    m.notifiable = 'issue_updated'
+    m.to = '@mentioned'
+    m.save!
+
+    log_user('jsmith', 'jsmith')
+
+    perform_enqueued_jobs do
+      put_issue_edit do
+        put(
+          '/issues/2',
+          params: {
+            issue: {
+              subject: "test issue",
+              description: '@admin',
+            }
+          })
+      end
+    end
+
+    assert_equal 1, ActionMailer::Base.deliveries.length
+    assert_equal 1, ActionMailer::Base.deliveries.last.to.length
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.to
+    assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
+  end
+
+  def test_issue_edit_recipient_mentioned_notes
+    skip unless Redmine::VERSION::MAJOR >= 5
+
+    Project.find(1).enable_module!(:mail_recipient)
+
+    m = MailRecipient.new
+    m.project_id = 1
+    m.notifiable = 'issue_updated'
+    m.to = '@mentioned'
+    m.save!
+
+    log_user('jsmith', 'jsmith')
+
+    perform_enqueued_jobs do
+      put_issue_edit do
+        put(
+          '/issues/2',
+          params: {
+            issue: {
+              subject: "test issue",
+              notes: '@admin',
+            }
+          })
+      end
+    end
+
+    assert_equal 1, ActionMailer::Base.deliveries.length
+    assert_equal 1, ActionMailer::Base.deliveries.last.to.length
+    assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.to
+    assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
   end
 
   def put_issue_edit(&block)
