@@ -18,7 +18,7 @@ Redmine::Plugin.register :redmine_mail_recipient do
   name 'Redmine Mail Recipient plugin'
   author '9506hqwy'
   description 'This is a mail recipient plugin for Redmine'
-  version '0.2.0'
+  version '0.3.0'
   url 'https://github.com/9506hqwy/redmine_mail_recipient'
   author_url 'https://github.com/9506hqwy'
 
