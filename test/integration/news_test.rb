@@ -21,11 +21,12 @@ class NewssTest < Redmine::IntegrationTest
   def setup
     Setting.bcc_recipients = false if Setting.available_settings.key?('bcc_recipients')
     Setting.notified_events = ['news_added', 'news_comment_added']
-    Project.find(1).enable_module!(:mail_delivery_compat3)
     ActionMailer::Base.deliveries.clear
   end
 
-  def test_news_add
+  def test_news_add_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
+
     log_user('jsmith', 'jsmith')
 
     perform_enqueued_jobs do
@@ -48,7 +49,8 @@ class NewssTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
   end
 
-  def test_news_add_recipient_author
+  def test_news_add_recipient_author_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -81,7 +83,8 @@ class NewssTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_news_add_recipient_watchers
+  def test_news_add_recipient_watchers_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -114,7 +117,9 @@ class NewssTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_news_comment_add
+  def test_news_comment_add_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
+
     log_user('jsmith', 'jsmith')
 
     perform_enqueued_jobs do
@@ -133,7 +138,8 @@ class NewssTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
   end
 
-  def test_news_comment_add_recipient_author
+  def test_news_comment_add_recipient_author_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -162,7 +168,8 @@ class NewssTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_news_comment_add_recipient_watchers
+  def test_news_comment_add_recipient_watchers_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new

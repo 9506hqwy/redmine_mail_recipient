@@ -22,11 +22,12 @@ class MessagesTest < Redmine::IntegrationTest
   def setup
     Setting.bcc_recipients = false if Setting.available_settings.key?('bcc_recipients')
     Setting.notified_events = ['message_posted']
-    Project.find(1).enable_module!(:mail_delivery_compat3)
     ActionMailer::Base.deliveries.clear
   end
 
-  def test_message_posted
+  def test_message_posted_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
+
     log_user('jsmith', 'jsmith')
 
     perform_enqueued_jobs do
@@ -48,7 +49,8 @@ class MessagesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
   end
 
-  def test_message_posted_recipient_author
+  def test_message_posted_recipient_author_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -80,7 +82,8 @@ class MessagesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_message_posted_recipient_watchers
+  def test_message_posted_recipient_watchers_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new

@@ -25,11 +25,12 @@ class IssuesTest < Redmine::IntegrationTest
   def setup
     Setting.bcc_recipients = false if Setting.available_settings.key?('bcc_recipients')
     Setting.notified_events = ['issue_added', 'issue_updated']
-    Project.find(1).enable_module!(:mail_delivery_compat3)
     ActionMailer::Base.deliveries.clear
   end
 
-  def test_issue_add
+  def test_issue_add_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
+
     log_user('jsmith', 'jsmith')
 
     perform_enqueued_jobs do
@@ -53,7 +54,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
   end
 
-  def test_issue_add_recipient_author
+  def test_issue_add_recipient_author_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -87,7 +89,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_add_recipient_assigned_to
+  def test_issue_add_recipient_assigned_to_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -122,7 +125,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_add_recipient_watchers
+  def test_issue_add_recipient_watchers_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -156,9 +160,10 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_add_recipient_mentioned
+  def test_issue_add_recipient_mentioned_compat3
     skip unless Redmine::VERSION::MAJOR >= 5
 
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -191,7 +196,9 @@ class IssuesTest < Redmine::IntegrationTest
     assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
   end
 
-  def test_issue_edit
+  def test_issue_edit_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
+
     log_user('jsmith', 'jsmith')
 
     perform_enqueued_jobs do
@@ -214,7 +221,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_edit_recipient_author
+  def test_issue_edit_recipient_author_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -246,7 +254,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_edit_recipient_assigned_to
+  def test_issue_edit_recipient_assigned_to_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -278,7 +287,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_edit_recipient_previous_assignee
+  def test_issue_edit_recipient_previous_assignee_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -310,7 +320,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_edit_recipient_watchers
+  def test_issue_edit_recipient_watchers_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -342,7 +353,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'jsmith@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_edit_recipient_commenter
+  def test_issue_edit_recipient_commenter_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -374,7 +386,8 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_edit_recipient_commenters
+  def test_issue_edit_recipient_commenters_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -406,9 +419,10 @@ class IssuesTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_issue_edit_recipient_mentioned_description
+  def test_issue_edit_recipient_mentioned_description_compat3
     skip unless Redmine::VERSION::MAJOR >= 5
 
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -438,9 +452,10 @@ class IssuesTest < Redmine::IntegrationTest
     assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
   end
 
-  def test_issue_edit_recipient_mentioned_notes
+  def test_issue_edit_recipient_mentioned_notes_compat3
     skip unless Redmine::VERSION::MAJOR >= 5
 
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new

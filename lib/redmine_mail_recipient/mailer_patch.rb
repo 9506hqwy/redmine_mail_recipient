@@ -27,11 +27,6 @@ module RedmineMailRecipient
 
     def mail_recipient_find_setting_by_project(project)
       return nil unless project
-
-      if Redmine::VERSION::MAJOR >= 4 && !project.module_enabled?(:mail_delivery_compat3)
-        return nil
-      end
-
       return nil unless project.module_enabled?(:mail_recipient)
       return nil unless mail_recipient_notifiable
 
@@ -83,7 +78,11 @@ module RedmineMailRecipient
     end
 
     def mail_recipient_classify_recipients(headers, setting)
-      users = headers.fetch(:to, []) | headers.fetch(:cc, [])
+      users = []
+      [:to, :cc, :bcc].each do |key|
+        u = headers.fetch(key, [])
+        users |= u.is_a?(Enumerable) ? u : [u]
+      end
       return if users.blank?
 
       recipients = {
@@ -104,14 +103,14 @@ module RedmineMailRecipient
           .map { |j| j.user }
           .uniq
         if mail_recipient_enable_mention
-          @journal.mail_delivery_compat3_parse_mentions_for_issue_edit
+          @journal.mail_recipient_parse_mentions_for_issue_edit
           recipients['@mentioned'] = @journal.notified_mentions | @journal.journalized.notified_mentions
         end
       elsif @issue # issue_add
         recipients['@assigned_to'] = @issue.assigned_to if @issue.assigned_to
         recipients['@watchers'] = @issue.notified_watchers
         if mail_recipient_enable_mention
-          @issue.mail_delivery_compat3_parse_mentions_for_issue_add
+          @issue.mail_recipient_parse_mentions_for_issue_add
           recipients['@mentioned'] = @issue.notified_mentions
         end
       elsif @document # document_added
@@ -127,7 +126,7 @@ module RedmineMailRecipient
       elsif @wiki_content # wiki_content_added / wiki_content_updated
         recipients['@watchers'] = @wiki_content.page.wiki.notified_watchers | @wiki_content.page.notified_watchers
         if mail_recipient_enable_mention
-          @wiki_content.mail_delivery_compat3_parse_mentions_for_wiki_content
+          @wiki_content.mail_recipient_parse_mentions_for_wiki_content
           recipients['@mentioned'] = @wiki_content.notified_mentions
         end
       elsif @text && @project

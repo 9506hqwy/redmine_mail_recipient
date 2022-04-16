@@ -24,11 +24,12 @@ class WikiTest < Redmine::IntegrationTest
   def setup
     Setting.bcc_recipients = false if Setting.available_settings.key?('bcc_recipients')
     Setting.notified_events = ['wiki_content_added', 'wiki_content_updated', 'wiki_comment_added']
-    Project.find(1).enable_module!(:mail_delivery_compat3)
     ActionMailer::Base.deliveries.clear
   end
 
-  def test_wiki_content_added
+  def test_wiki_content_added_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
+
     log_user('jsmith', 'jsmith')
 
     perform_enqueued_jobs do
@@ -49,7 +50,8 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
   end
 
-  def test_wiki_content_added_recipient_author
+  def test_wiki_content_added_recipient_author_comapt3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -80,7 +82,8 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_wiki_content_added_recipient_watchers
+  def test_wiki_content_added_recipient_watchers_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -111,9 +114,10 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_wiki_content_added_recipient_mentioned
+  def test_wiki_content_added_recipient_mentioned_compat3
     skip unless Redmine::VERSION::MAJOR >= 5
 
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -142,7 +146,9 @@ class WikiTest < Redmine::IntegrationTest
     assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
   end
 
-  def test_wiki_content_updated
+  def test_wiki_content_updated_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
+
     log_user('jsmith', 'jsmith')
 
     perform_enqueued_jobs do
@@ -166,7 +172,8 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc if default_watcher_added
   end
 
-  def test_wiki_content_updated_recipient_author
+  def test_wiki_content_updated_recipient_author_compat3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -199,7 +206,8 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'admin@somenet.foo', ActionMailer::Base.deliveries.last.cc if default_watcher_added
   end
 
-  def test_wiki_content_updated_recipient_watchers
+  def test_wiki_content_updated_recipient_watchers_comapt3
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -232,9 +240,10 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.cc
   end
 
-  def test_wiki_content_updated_recipient_mentioned
+  def test_wiki_content_updated_recipient_mentioned_compat3
     skip unless Redmine::VERSION::MAJOR >= 5
 
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
 
     m = MailRecipient.new
@@ -261,13 +270,14 @@ class WikiTest < Redmine::IntegrationTest
     assert_equal 0, ActionMailer::Base.deliveries.last.cc.length
   end
 
-  def test_wiki_comment_added
+  def test_wiki_comment_added_compat3
     skip unless Redmine::Plugin.installed?(:redmine_wiki_extensions)
 
     plugin = Redmine::Plugin.find(:redmine_wiki_extensions)
     version = plugin.version.split('.').map(&:to_i)
     skip unless ([0, 9, 3] <=> version) <= 0
 
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:wiki_extensions)
     Role.find(1).add_permission!(:add_wiki_comment)
 
@@ -292,13 +302,14 @@ class WikiTest < Redmine::IntegrationTest
     assert_include 'dlopper@somenet.foo', ActionMailer::Base.deliveries.last.to
   end
 
-  def test_wiki_comment_added_author
+  def test_wiki_comment_added_author_compat3
     skip unless Redmine::Plugin.installed?(:redmine_wiki_extensions)
 
     plugin = Redmine::Plugin.find(:redmine_wiki_extensions)
     version = plugin.version.split('.').map(&:to_i)
     skip unless ([0, 9, 3] <=> version) <= 0
 
+    Project.find(1).enable_module!(:mail_delivery_compat3)
     Project.find(1).enable_module!(:mail_recipient)
     Project.find(1).enable_module!(:wiki_extensions)
     Role.find(1).add_permission!(:add_wiki_comment)
