@@ -29,7 +29,7 @@
 
   <p>
     <label for="mail_recipient_to"><%= l(:label_recipient_to) %>:</label>
-    <%= text_field_tag('mail_recipient_to', recipient.to) %>
+    <%= text_field_tag('mail_recipient_to', recipient.to, style: 'width: 100%') %>
   </p>
 
   <p>
@@ -44,7 +44,7 @@
 
   <p>
     <label for="mail_recipient_cc"><%= l(:label_recipient_cc) %>:</label>
-    <%= text_field_tag('mail_recipient_cc', recipient.cc) %>
+    <%= text_field_tag('mail_recipient_cc', recipient.cc, style: 'width: 100%') %>
   </p>
 
   <p>
