@@ -3,10 +3,13 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 class MailRecipientTest < ActiveSupport::TestCase
-  fixtures :groups_users,
+  fixtures :email_addresses,
+           :enabled_modules,
+           :groups_users,
            :issues,
            :journals,
            :projects,
+           :roles,
            :trackers,
            :users,
            :watchers

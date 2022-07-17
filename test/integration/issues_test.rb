@@ -11,7 +11,10 @@ class IssuesTest < Redmine::IntegrationTest
            :enabled_modules,
            :enumerations,
            :issues,
+           :issue_categories,
            :issue_statuses,
+           :journal_details,
+           :journals,
            :member_roles,
            :members,
            :projects,
@@ -20,6 +23,7 @@ class IssuesTest < Redmine::IntegrationTest
            :user_preferences,
            :users,
            :trackers,
+           :versions,
            :watchers
 
   def setup
