@@ -47,13 +47,14 @@ This plugin provides a mail recipient customization method per project.
 
 Recipient keyword is bellow.
 
-- Create issue
+- Issue added
 
+  - `@author`: issue's reporter
   - `@assigned_to`: issue's assignee
   - `@watchers`: issue's watcher
   - `@mentioned`: mentioned user (Redmine5.0 or later)
 
-- Update issue
+- Issue updated
 
   - `@author`: issue's reporter
   - `@assigned_to`: issue's assignee
@@ -63,20 +64,32 @@ Recipient keyword is bellow.
   - `@commenters`: all issue's editor
   - `@mentioned`: mentioned user (Redmine5.0 or later)
 
-- Create news
+- Document added
 
+  - `@author`: document's creator
+
+- File added
+
+  - `@author`: file's creator
+
+- News added
+
+  - `@author`: news's creator
   - `@watchers`: news's watcher
 
-- Comment news
+- Comment added to a news
 
+  - `@author`: news's commenter
   - `@watchers`: news's watcher
 
-- Create message
+- Message added
 
+  - `@author`: message's creator
   - `@watchers`: forum's watcher
 
-- Create/Update wiki
+- Wiki page added / Wiki page updated
 
+  - `@author`: wiki's creator/editor
   - `@watchers`: wiki's watcher
   - `@mentioned`: mentioned user (Redmine5.0 or later)
 
