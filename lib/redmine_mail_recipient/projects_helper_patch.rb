@@ -48,7 +48,9 @@ module RedmineMailRecipient
 end
 
 if ActiveSupport::VERSION::MAJOR >= 5
-  ProjectsHelper.prepend RedmineMailRecipient::ProjectsHelperPatch5
+  Rails.application.config.after_initialize do
+    ProjectsController.send(:helper, RedmineMailRecipient::ProjectsHelperPatch5)
+  end
 else
   ProjectsHelper.include RedmineMailRecipient::ProjectsHelperPatch4
 end
