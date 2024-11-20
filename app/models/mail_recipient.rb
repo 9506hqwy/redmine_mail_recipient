@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MailRecipient < ActiveRecord::Base
+class MailRecipient < RedmineMailRecipient::Utils::ModelBase
   belongs_to :project
   belongs_to :tracker
 
