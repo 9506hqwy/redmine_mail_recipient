@@ -10,13 +10,17 @@ This plugin provides a mail recipient customization method per project.
 ## Installation
 
 1. Download plugin in Redmine plugin directory.
+
    ```sh
    git clone https://github.com/9506hqwy/redmine_mail_recipient.git
    ```
+
 2. Install plugin in Redmine directory.
+
    ```sh
    bundle exec rake redmine:plugins:migrate NAME=redmine_mail_recipient RAILS_ENV=production
    ```
+
 3. Start Redmine
 
 ## Configuration
@@ -95,14 +99,13 @@ Recipient keyword is bellow.
 
 ## Tested Environment
 
-* Redmine (Docker Image)
-  * 3.4
-  * 4.1
-  * 4.2
-  * 5.0
-  * 5.1
-  * 6.0
-* Database
-  * SQLite
-  * MySQL 5.7 or 8.0
-  * PostgreSQL 12
+- Redmine (Docker Image)
+  - 4.1
+  - 4.2
+  - 5.0
+  - 5.1
+  - 6.0
+- Database
+  - SQLite
+  - MySQL 5.7 or 8.0
+  - PostgreSQL 14
