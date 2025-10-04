@@ -21,9 +21,9 @@ jobs:
   postgres:
     uses: 9506hqwy/actions/.github/workflows/redmine-ci-postgres.yml@main
     with:
-      redmine-versions: '["4.1", "4.2", "5.0", "5.1", "6.0"]'
+      redmine-versions: '["4.1", "4.2", "5.0", "5.1", "6.0", "6.1"]'
 
   sqlite3:
     uses: 9506hqwy/actions/.github/workflows/redmine-ci-sqlite3.yml@main
     with:
-      redmine-versions: '["4.1", "4.2", "5.0", "5.1", "6.0"]'
+      redmine-versions: '["4.1", "4.2", "5.0", "5.1", "6.0", "6.1"]'
