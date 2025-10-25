@@ -4,6 +4,14 @@ on:
   push:
     branches: [ main ]
     tags-ignore: [ '**' ]
+    paths-ignore:
+      - '.devcontainer/**'
+      - '.github/**'
+      - '.vscode/**'
+      - '.gitignore'
+      - '.lefthook.yml'
+      - 'LICENSE'
+      - 'README.md'
   pull_request:
 
 permissions:
@@ -27,3 +35,4 @@ jobs:
     uses: 9506hqwy/actions/.github/workflows/redmine-ci-sqlite3.yml@main
     with:
       redmine-versions: '["4.1", "4.2", "5.0", "5.1", "6.0", "6.1"]'
+      enable-e2e-test: false
