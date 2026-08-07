@@ -4,7 +4,6 @@ class MailRecipient < RedmineMailRecipient::Utils::ModelBase
   belongs_to :project
   belongs_to :tracker
 
-  validates :project, presence: true
   validates :notifiable, presence: true
 
   def update_mail_headers(headers, users, recipients)
