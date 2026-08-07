@@ -20,19 +20,14 @@ permissions:
 jobs:
   mysql57:
     uses: 9506hqwy/actions/.github/workflows/redmine-ci-mysql57.yml@main
-    with:
-      redmine-versions: '["4.1", "4.2", "5.0"]'
 
   mysql80:
     uses: 9506hqwy/actions/.github/workflows/redmine-ci-mysql80.yml@main
 
   postgres:
     uses: 9506hqwy/actions/.github/workflows/redmine-ci-postgres.yml@main
-    with:
-      redmine-versions: '["4.1", "4.2", "5.0", "5.1", "6.0", "6.1"]'
 
   sqlite3:
     uses: 9506hqwy/actions/.github/workflows/redmine-ci-sqlite3.yml@main
     with:
-      redmine-versions: '["4.1", "4.2", "5.0", "5.1", "6.0", "6.1"]'
       enable-e2e-test: false
